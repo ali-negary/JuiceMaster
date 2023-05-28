@@ -4,8 +4,7 @@ import uuid
 from datetime import datetime, timedelta
 
 from src.database.database import db
-
-BATTERY_HEALTH_ORDER = ('BAD', 'GOOD', 'VERY GOOD', 'EXCELLENT')
+from src.config.app_config import BATTERY_HEALTH_ORDER
 
 
 class Battery(db.Model):

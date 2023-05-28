@@ -6,6 +6,7 @@ from flask import Blueprint, request, jsonify
 
 from src.database.database import db
 from src.database.model_battery import Battery
+from src.input_validators import validate_battery_data, validate_input
 
 
 logger = logging.getLogger()
@@ -16,6 +17,7 @@ battery_subscriber = Blueprint(
 
 
 @battery_subscriber.route("/batteries", methods=["GET"])
+@validate_input(validate_battery_data)
 def get_all_batteries():
     """Retrieve a list of all batteries and their associated data."""
 
@@ -37,6 +39,7 @@ def get_all_batteries():
 
 
 @battery_subscriber.route("/batteries/<uuid:id>", methods=["GET"])
+@validate_input(validate_battery_data)
 def get_battery_by_id(id):
     """Retrieve the data for a specific battery by its ID."""
 
@@ -58,6 +61,7 @@ def get_battery_by_id(id):
 
 
 @battery_subscriber.route("/batteries", methods=["POST"])
+@validate_input(validate_battery_data)
 def add_battery():
     """Add a new battery with its state of charge, capacity, and voltage."""
 
@@ -76,6 +80,7 @@ def add_battery():
 
 
 @battery_subscriber.route("/batteries/<uuid:id>", methods=["PUT"])
+@validate_input(validate_battery_data)
 def update_battery(id):
     battery = Battery.query.get(id)
     if battery:
@@ -92,6 +97,7 @@ def update_battery(id):
 
 
 @battery_subscriber.route("/batteries/<uuid:id>", methods=["DELETE"])
+@validate_input(validate_battery_data)
 def delete_battery(id):
     """Remove a specific battery by its ID."""
 

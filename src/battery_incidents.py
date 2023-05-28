@@ -7,6 +7,7 @@ from flask import Blueprint, request, jsonify
 from src.database.database import db
 from src.database.model_incident import Incident
 from src.database.model_battery import Battery
+from src.input_validators import validate_issue_data, validate_input
 
 logger = logging.getLogger()
 
@@ -16,6 +17,7 @@ battery_incidents = Blueprint(
 
 
 @battery_incidents.route("/batteries/<uuid:id>/issues", methods=["GET"])
+@validate_input(validate_issue_data)
 def get_battery_issues(id):
     """Retrieve a list of all issues associated with a specific battery."""
 
@@ -38,6 +40,7 @@ def get_battery_issues(id):
 
 
 @battery_incidents.route("/batteries/<uuid:id>/issues", methods=["POST"])
+@validate_input(validate_issue_data)
 def add_battery_issue(id):
     """Add a new issue associated with a specific battery."""
 
@@ -60,6 +63,7 @@ def add_battery_issue(id):
 @battery_incidents.route(
     "/batteries/<uuid:battery_id>/issues/<int:issue_id>", methods=["PUT"]
 )
+@validate_input(validate_issue_data)
 def update_battery_issue(battery_id, issue_id):
     """Update the details of a specific issue associated with a battery."""
 
@@ -83,6 +87,7 @@ def update_battery_issue(battery_id, issue_id):
 @battery_incidents.route(
     "/batteries/<uuid:battery_id>/issues/<int:issue_id>", methods=["DELETE"]
 )
+@validate_input(validate_issue_data)
 def delete_battery_issue(battery_id, issue_id):
     """Remove a specific issue associated with a battery."""
 
