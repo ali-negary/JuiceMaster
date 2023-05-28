@@ -8,40 +8,45 @@ from src.config.app_config import BATTERY_HEALTH_ORDER
 
 
 class Battery(db.Model):
+    """DB ORM for 'Batteries' table."""
 
-    __tablename__ = 'batteries'
+    __tablename__ = "batteries"
 
-    id = db.Column(db.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    battery_id = db.Column(db.String, primary_key=True)
     state_of_charge = db.Column(db.Float)
     capacity = db.Column(db.Float)
     voltage = db.Column(db.Float)
-    battery_health = db.Column(db.Enum(BATTERY_HEALTH_ORDER), default='EXCELLENT')
+    battery_health = db.Column(db.Enum(BATTERY_HEALTH_ORDER), default="EXCELLENT")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
-    def __init__(self, state_of_charge, capacity, voltage, battery_health):
+    def __init__(self, state_of_charge, capacity, voltage, battery_health, battery_id=None):
+        self.battery_id = battery_id if battery_id else str(uuid.uuid4())
         self.state_of_charge = state_of_charge
         self.capacity = capacity
         self.voltage = voltage
         self.battery_health = battery_health
 
     def __repr__(self) -> str:
-        return f"Battery(" \
-               f"id='{self.id}', " \
-               f"charge={self.state_of_charge}%, " \
-               f"health='{self.battery_health}', " \
-               f"updated_at='{self.updated_at}'" \
-               f")"
+        return (
+            f"Battery("
+            f"id='{self.battery_id}', "
+            f"charge={self.state_of_charge}%, "
+            f"health='{self.battery_health}', "
+            f"updated_at='{self.updated_at}'"
+            f")"
+        )
 
     def calculate_health(self):
         # Get the state of charge values for the last 24 hours
         yesterday = datetime.utcnow() - timedelta(days=1)
-        state_of_charge_values = db.session.query(
-            Battery.state_of_charge
-        ).filter(
-            Battery.id == self.id,
-            Battery.updated_at >= yesterday
-        ).all()
+        state_of_charge_values = (
+            db.session.query(Battery.state_of_charge)
+            .filter(Battery.id == self.id, Battery.updated_at >= yesterday)
+            .all()
+        )
 
         # Count the number of times the state of charge exceeds the limits
         exceed_count = 0
@@ -52,7 +57,7 @@ class Battery(db.Model):
         # Update the health based on the exceed count
         if self.battery_health != "BAD" and exceed_count > 2:
             index = BATTERY_HEALTH_ORDER.index(self.battery_health)
-            self.battery_health = BATTERY_HEALTH_ORDER[index-1]
+            self.battery_health = BATTERY_HEALTH_ORDER[index - 1]
 
     def update_battery(self, state_of_charge, capacity, voltage, battery_health):
         self.state_of_charge = state_of_charge

@@ -5,19 +5,19 @@ import logging
 from flask import Blueprint, request, jsonify
 
 from src.database.database import db
-from src.database.model_incident import Incident
+from src.database.model_incident import Issue
 from src.database.model_battery import Battery
-from src.input_validators import validate_issue_data, validate_input
+from src.utils.input_validators import validate_input
 
 logger = logging.getLogger()
 
-battery_incidents = Blueprint(
-    "battery_incidents", __name__, url_prefix="/api/v1/incidents/"
+battery_issues = Blueprint(
+    "battery_issues", __name__, url_prefix="/api/v1/issues/"
 )
 
 
-@battery_incidents.route("/batteries/<uuid:id>/issues", methods=["GET"])
-@validate_input(validate_issue_data)
+@battery_issues.get("/batteries/<uuid:id>/issues")
+@validate_input(api="incidents")
 def get_battery_issues(id):
     """Retrieve a list of all issues associated with a specific battery."""
 
@@ -39,8 +39,8 @@ def get_battery_issues(id):
         return jsonify({"message": "Battery not found"}), 404
 
 
-@battery_incidents.route("/batteries/<uuid:id>/issues", methods=["POST"])
-@validate_input(validate_issue_data)
+@battery_issues.post("/batteries/<uuid:id>/issues")
+@validate_input(api="incidents")
 def add_battery_issue(id):
     """Add a new issue associated with a specific battery."""
 
@@ -50,7 +50,7 @@ def add_battery_issue(id):
         issue_type = data.get("issue_type")
         issue_description = data.get("issue_description")
 
-        issue = Incident(issue_type, issue_description)
+        issue = Issue(issue_type, issue_description)
         battery.issues.append(issue)
         db.session.commit()
         db.session.close()
@@ -60,16 +60,14 @@ def add_battery_issue(id):
         return jsonify({"message": "Battery not found"}), 404
 
 
-@battery_incidents.route(
-    "/batteries/<uuid:battery_id>/issues/<int:issue_id>", methods=["PUT"]
-)
-@validate_input(validate_issue_data)
+@battery_issues.put("/batteries/<uuid:battery_id>/issues/<int:issue_id>")
+@validate_input(api="incidents")
 def update_battery_issue(battery_id, issue_id):
     """Update the details of a specific issue associated with a battery."""
 
     battery = Battery.query.get(battery_id)
     if battery:
-        issue = Incident.query.get(issue_id)
+        issue = Issue.query.get(issue_id)
         if issue:
             data = request.json
             issue.issue_type = data.get("issue_type")
@@ -84,16 +82,14 @@ def update_battery_issue(battery_id, issue_id):
         return jsonify({"message": "Battery not found"}), 404
 
 
-@battery_incidents.route(
-    "/batteries/<uuid:battery_id>/issues/<int:issue_id>", methods=["DELETE"]
-)
-@validate_input(validate_issue_data)
+@battery_issues.delete("/batteries/<uuid:battery_id>/issues/<int:issue_id>")
+@validate_input(api="incidents")
 def delete_battery_issue(battery_id, issue_id):
     """Remove a specific issue associated with a battery."""
 
     battery = Battery.query.get(battery_id)
     if battery:
-        issue = Incident.query.get(issue_id)
+        issue = Issue.query.get(issue_id)
         if issue:
             battery.issues.remove(issue)
             db.session.commit()

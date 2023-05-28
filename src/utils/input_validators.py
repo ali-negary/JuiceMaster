@@ -1,5 +1,6 @@
 """This module contains the input validator for batteries and issues APIs."""
 
+import functools
 
 from flask import request, jsonify
 
@@ -50,14 +51,22 @@ def validate_issue_data(data):
     return None
 
 
-def validate_input(validation_func):
+def validate_input(api):
     def decorator(func):
         """Performs validation checks on input data.
         Returns {"error": "error message"} if invalid."""
 
+        @functools.wraps(func)
         def wrapper(*args, **kwargs):
             data = request.get_json()
-            error = validation_func(data)
+
+            if api == "subscriber":
+                error = validate_battery_data(data=data)
+            elif api == "incidents":
+                error = validate_issue_data(data=data)
+            else:
+                raise ValueError("Invalid API specified.")
+
             if error:
                 return jsonify({"error": error}), 400
             return func(*args, **kwargs)

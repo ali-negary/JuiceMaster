@@ -6,7 +6,7 @@ from flask import Blueprint, request, jsonify
 
 from src.database.database import db
 from src.database.model_battery import Battery
-from src.input_validators import validate_battery_data, validate_input
+from src.utils.input_validators import validate_input
 
 
 logger = logging.getLogger()
@@ -16,8 +16,8 @@ battery_subscriber = Blueprint(
 )
 
 
-@battery_subscriber.route("/batteries", methods=["GET"])
-@validate_input(validate_battery_data)
+@battery_subscriber.get("/batteries")
+@validate_input(api="subscriber")
 def get_all_batteries():
     """Retrieve a list of all batteries and their associated data."""
 
@@ -38,8 +38,8 @@ def get_all_batteries():
     return jsonify(battery_list)
 
 
-@battery_subscriber.route("/batteries/<uuid:id>", methods=["GET"])
-@validate_input(validate_battery_data)
+@battery_subscriber.get("/batteries/<uuid:id>")
+@validate_input(api="subscriber")
 def get_battery_by_id(id):
     """Retrieve the data for a specific battery by its ID."""
 
@@ -60,8 +60,8 @@ def get_battery_by_id(id):
         return jsonify({"message": "Battery not found"}), 404
 
 
-@battery_subscriber.route("/batteries", methods=["POST"])
-@validate_input(validate_battery_data)
+@battery_subscriber.post("/batteries")
+@validate_input(api="subscriber")
 def add_battery():
     """Add a new battery with its state of charge, capacity, and voltage."""
 
@@ -79,8 +79,8 @@ def add_battery():
     return jsonify({"message": "Battery added successfully"}), 201
 
 
-@battery_subscriber.route("/batteries/<uuid:id>", methods=["PUT"])
-@validate_input(validate_battery_data)
+@battery_subscriber.put("/batteries/<uuid:id>")
+@validate_input(api="subscriber")
 def update_battery(id):
     battery = Battery.query.get(id)
     if battery:
@@ -96,8 +96,8 @@ def update_battery(id):
         return jsonify({"message": "Battery not found"}), 404
 
 
-@battery_subscriber.route("/batteries/<uuid:id>", methods=["DELETE"])
-@validate_input(validate_battery_data)
+@battery_subscriber.delete("/batteries/<uuid:id>")
+@validate_input(api="subscriber")
 def delete_battery(id):
     """Remove a specific battery by its ID."""
 
