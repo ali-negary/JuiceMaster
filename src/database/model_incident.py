@@ -11,7 +11,9 @@ class Issue(db.Model):
 
     __tablename__ = "incidents"
 
-    issue_id = db.Column(db.String, primary_key=True)  # SQLLite does not have a native UUID type.
+    issue_id = db.Column(
+        db.String, primary_key=True
+    )  # SQLLite does not have a native UUID type.
     issue_type = db.Column(db.String(50))
     issue_description = db.Column(db.String(255))
     occurrence_timestamp = db.Column(db.DateTime, default=datetime.utcnow)

@@ -16,12 +16,12 @@ battery_issues = Blueprint(
 )
 
 
-@battery_issues.get("/batteries/<uuid:id>/issues")
+@battery_issues.get("/batteries/<uuid:battery_id>/issues")
 @validate_input(api="incidents")
-def get_battery_issues(id):
+def get_battery_issues(battery_id):
     """Retrieve a list of all issues associated with a specific battery."""
 
-    battery = Battery.query.get(id)
+    battery = Battery.query.get(battery_id)
     if battery:
         issues = battery.issues
         issue_list = []
@@ -35,16 +35,15 @@ def get_battery_issues(id):
                 }
             )
         return jsonify(issue_list)
-    else:
-        return jsonify({"message": "Battery not found"}), 404
+    return jsonify({"message": "Battery not found"}), 404
 
 
-@battery_issues.post("/batteries/<uuid:id>/issues")
+@battery_issues.post("/batteries/<uuid:battery_id>/issues")
 @validate_input(api="incidents")
-def add_battery_issue(id):
+def add_battery_issue(battery_id):
     """Add a new issue associated with a specific battery."""
 
-    battery = Battery.query.get(id)
+    battery = Battery.query.get(battery_id)
     if battery:
         data = request.json
         issue_type = data.get("issue_type")
@@ -56,8 +55,7 @@ def add_battery_issue(id):
         db.session.close()
 
         return jsonify({"message": "Issue added successfully"}), 201
-    else:
-        return jsonify({"message": "Battery not found"}), 404
+    return jsonify({"message": "Battery not found"}), 404
 
 
 @battery_issues.put("/batteries/<uuid:battery_id>/issues/<int:issue_id>")
@@ -76,10 +74,8 @@ def update_battery_issue(battery_id, issue_id):
             db.session.close()
 
             return jsonify({"message": "Issue updated successfully"})
-        else:
-            return jsonify({"message": "Issue not found"}), 404
-    else:
-        return jsonify({"message": "Battery not found"}), 404
+        return jsonify({"message": "Issue not found"}), 404
+    return jsonify({"message": "Battery not found"}), 404
 
 
 @battery_issues.delete("/batteries/<uuid:battery_id>/issues/<int:issue_id>")
@@ -96,7 +92,5 @@ def delete_battery_issue(battery_id, issue_id):
             db.session.close()
 
             return jsonify({"message": "Issue deleted successfully"})
-        else:
-            return jsonify({"message": "Issue not found"}), 404
-    else:
-        return jsonify({"message": "Battery not found"}), 404
+        return jsonify({"message": "Issue not found"}), 404
+    return jsonify({"message": "Battery not found"}), 404

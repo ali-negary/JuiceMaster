@@ -18,10 +18,12 @@ logger = logging.getLogger(__name__)
 
 
 def create_app():
+    """Main flask application function."""
+
     # Application configuration: start #
     secret_key = os.environ.get("SECRET_KEY", "Juice-Master-Secret-Key")
     db_uri = os.environ.get("SQLALCHEMY_DB_URI")
-    test_mode = True if os.environ.get("TEST_MODE", False) == "True" else False
+    test_mode = os.environ.get("TEST_MODE", False) == "True"
 
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(

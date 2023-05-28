@@ -38,12 +38,12 @@ def get_all_batteries():
     return jsonify(battery_list)
 
 
-@battery_subscriber.get("/batteries/<uuid:id>")
+@battery_subscriber.get("/batteries/<uuid:battery_id>")
 @validate_input(api="subscriber")
-def get_battery_by_id(id):
+def get_battery_by_id(battery_id):
     """Retrieve the data for a specific battery by its ID."""
 
-    battery = Battery.query.get(id)
+    battery = Battery.query.get(battery_id)
     if battery:
         return jsonify(
             {
@@ -56,8 +56,7 @@ def get_battery_by_id(id):
                 "updated_at": battery.updated_at,
             }
         )
-    else:
-        return jsonify({"message": "Battery not found"}), 404
+    return jsonify({"message": "Battery not found"}), 404
 
 
 @battery_subscriber.post("/batteries")
@@ -79,10 +78,10 @@ def add_battery():
     return jsonify({"message": "Battery added successfully"}), 201
 
 
-@battery_subscriber.put("/batteries/<uuid:id>")
+@battery_subscriber.put("/batteries/<uuid:battery_id>")
 @validate_input(api="subscriber")
-def update_battery(id):
-    battery = Battery.query.get(id)
+def update_battery(battery_id):
+    battery = Battery.query.get(battery_id)
     if battery:
         data = request.json
         battery.update_battery(
@@ -92,21 +91,19 @@ def update_battery(id):
             battery_health=data.get("battery_health"),
         )
         return jsonify({"message": "Battery updated successfully"})
-    else:
-        return jsonify({"message": "Battery not found"}), 404
+    return jsonify({"message": "Battery not found"}), 404
 
 
-@battery_subscriber.delete("/batteries/<uuid:id>")
+@battery_subscriber.delete("/batteries/<uuid:battery_id>")
 @validate_input(api="subscriber")
-def delete_battery(id):
+def delete_battery(battery_id):
     """Remove a specific battery by its ID."""
 
-    battery = Battery.query.get(id)
+    battery = Battery.query.get(battery_id)
     if battery:
         db.session.delete(battery)
         db.session.commit()
         db.session.close()
 
         return jsonify({"message": "Battery deleted successfully"})
-    else:
-        return jsonify({"message": "Battery not found"}), 404
+    return jsonify({"message": "Battery not found"}), 404

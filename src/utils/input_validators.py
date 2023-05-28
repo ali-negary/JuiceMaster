@@ -15,7 +15,7 @@ def validate_battery_data(data):
     if state_of_charge:
         if not isinstance(state_of_charge, (int, float)):
             return "Invalid 'type' for state of charge"
-        if not (0 < state_of_charge < 100):
+        if not 0 < state_of_charge < 100:
             return f"Charge value '{state_of_charge}' is not in the valid range (0-100)."
 
     capacity = data.get("capacity")
@@ -52,9 +52,10 @@ def validate_issue_data(data):
 
 
 def validate_input(api):
+    """Performs validation checks on input data."""
+
     def decorator(func):
-        """Performs validation checks on input data.
-        Returns {"error": "error message"} if invalid."""
+        """Returns {"error": "error message"} if invalid."""
 
         @functools.wraps(func)
         def wrapper(*args, **kwargs):

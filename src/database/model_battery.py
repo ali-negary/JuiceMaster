@@ -16,13 +16,22 @@ class Battery(db.Model):
     state_of_charge = db.Column(db.Float)
     capacity = db.Column(db.Float)
     voltage = db.Column(db.Float)
-    battery_health = db.Column(db.Enum(BATTERY_HEALTH_ORDER), default="EXCELLENT")
+    battery_health = db.Column(
+        db.Enum(BATTERY_HEALTH_ORDER), default="EXCELLENT"
+    )
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
 
-    def __init__(self, state_of_charge, capacity, voltage, battery_health, battery_id=None):
+    def __init__(
+        self,
+        state_of_charge,
+        capacity,
+        voltage,
+        battery_health,
+        battery_id=None,
+    ):
         self.battery_id = battery_id if battery_id else str(uuid.uuid4())
         self.state_of_charge = state_of_charge
         self.capacity = capacity
@@ -40,6 +49,9 @@ class Battery(db.Model):
         )
 
     def calculate_health(self):
+        """Checks the historical health check on the battery
+        and updates its status if needed."""
+
         # Get the state of charge values for the last 24 hours
         yesterday = datetime.utcnow() - timedelta(days=1)
         state_of_charge_values = (
@@ -59,10 +71,15 @@ class Battery(db.Model):
             index = BATTERY_HEALTH_ORDER.index(self.battery_health)
             self.battery_health = BATTERY_HEALTH_ORDER[index - 1]
 
-    def update_battery(self, state_of_charge, capacity, voltage, battery_health):
+    def update_battery(
+        self, state_of_charge, capacity, voltage, battery_health
+    ):
+        """Updates battery's record in the database."""
+
         self.state_of_charge = state_of_charge
         self.capacity = capacity
         self.voltage = voltage
+        self.battery_health = battery_health
         self.calculate_health()
         db.session.commit()
         db.session.close()
