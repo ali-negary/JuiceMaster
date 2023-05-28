@@ -70,22 +70,22 @@ def add_battery():
     battery = Battery(state_of_charge, capacity, voltage, battery_health)
     db.session.add(battery)
     db.session.commit()
+    db.session.close()
 
     return jsonify({"message": "Battery added successfully"}), 201
 
 
 @battery_subscriber.route("/batteries/<uuid:id>", methods=["PUT"])
 def update_battery(id):
-    """Update the data for a specific battery by its ID."""
-
     battery = Battery.query.get(id)
     if battery:
         data = request.json
-        battery.state_of_charge = data.get("state_of_charge")
-        battery.capacity = data.get("capacity")
-        battery.voltage = data.get("voltage")
-        battery.battery_health = data.get("battery_health")
-        db.session.commit()
+        battery.update_battery(
+            state_of_charge=data.get("state_of_charge"),
+            capacity=data.get("capacity"),
+            voltage=data.get("voltage"),
+            battery_health=data.get("battery_health"),
+        )
         return jsonify({"message": "Battery updated successfully"})
     else:
         return jsonify({"message": "Battery not found"}), 404
@@ -99,6 +99,8 @@ def delete_battery(id):
     if battery:
         db.session.delete(battery)
         db.session.commit()
+        db.session.close()
+
         return jsonify({"message": "Battery deleted successfully"})
     else:
         return jsonify({"message": "Battery not found"}), 404
