@@ -50,6 +50,7 @@ def add_battery_issue(id):
         issue = Incident(issue_type, issue_description)
         battery.issues.append(issue)
         db.session.commit()
+        db.session.close()
 
         return jsonify({"message": "Issue added successfully"}), 201
     else:
@@ -70,6 +71,8 @@ def update_battery_issue(battery_id, issue_id):
             issue.issue_type = data.get("issue_type")
             issue.issue_description = data.get("issue_description")
             db.session.commit()
+            db.session.close()
+
             return jsonify({"message": "Issue updated successfully"})
         else:
             return jsonify({"message": "Issue not found"}), 404
@@ -89,6 +92,8 @@ def delete_battery_issue(battery_id, issue_id):
         if issue:
             battery.issues.remove(issue)
             db.session.commit()
+            db.session.close()
+
             return jsonify({"message": "Issue deleted successfully"})
         else:
             return jsonify({"message": "Issue not found"}), 404

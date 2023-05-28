@@ -1,3 +1,6 @@
+"""This module contains application configurations."""
+
+
 import os
 
 
