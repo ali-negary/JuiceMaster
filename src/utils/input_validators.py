@@ -15,7 +15,7 @@ def validate_battery_data(data):
     if state_of_charge:
         if not isinstance(state_of_charge, (int, float)):
             return "Invalid 'type' for state of charge"
-        if not 0 < state_of_charge < 100:
+        if not 0 <= state_of_charge <= 100:
             return f"Charge value '{state_of_charge}' is not in the valid range (0-100)."
 
     capacity = data.get("capacity")

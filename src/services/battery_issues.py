@@ -5,7 +5,7 @@ import logging
 from flask import Blueprint, request, jsonify
 
 from src.database.database import db
-from src.database.model_incident import Issue
+from src.database.model_issue import Issue
 from src.database.model_battery import Battery
 from src.utils.input_validators import validate_input
 

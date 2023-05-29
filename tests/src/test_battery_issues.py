@@ -6,7 +6,7 @@ import unittest
 from src.app import create_app
 from src.database.database import db
 from src.database.model_battery import Battery
-from src.database.model_incident import Issue
+from src.database.model_issue import Issue
 
 
 class IssueAPITestCase(unittest.TestCase):
