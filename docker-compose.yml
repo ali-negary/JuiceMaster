@@ -1,0 +1,33 @@
+version: '3'
+services:
+  flask_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: JuiceMaster
+    ports:
+      - 5000:5000
+    depends_on:
+      - postgres_db
+    environment:
+      - FLASK_APP=src.app
+      - SQLALCHEMY_DB_URI=postgresql://${DB_USER}:${DB_PASSWORD}@JuiceMasterDB:5432/${DB_NAME}
+    restart: always
+    env_file:
+      - .env
+
+  postgres_db:
+    image: postgres:latest
+    container_name: JuiceMasterDB
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+
