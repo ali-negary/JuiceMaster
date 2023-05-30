@@ -1,13 +1,16 @@
 """This module handles all the requests to battery subscriber service."""
 
 import logging
+from datetime import datetime
 
 from flask import Blueprint, request, jsonify
 
 from src.database.database import db
 from src.database.model_battery import Battery
+from src.database.model_battery_log import BatteryLog
 from src.utils.input_validators import validate_input
 
+from src.services.battery_health_check import HealthCheck
 
 logger = logging.getLogger()
 
@@ -68,9 +71,26 @@ def add_battery():
     voltage = data.get("voltage")
     battery_health = data.get("battery_health")
 
-    battery = Battery(state_of_charge, capacity, voltage, battery_health)
+    # add battery to database.
+    battery = Battery(
+        state_of_charge=state_of_charge,
+        capacity=capacity,
+        voltage=voltage,
+        battery_health=battery_health,
+    )
     battery_id = battery.battery_id
+    created_at = battery.created_at
     db.session.add(battery)
+
+    # add its initial log
+    log = BatteryLog(
+        battery_id=battery_id,
+        state_of_charge=state_of_charge,
+        voltage=voltage,
+        timestamp=created_at,
+    )
+    db.session.add(log)
+
     db.session.commit()
     db.session.close()
 
@@ -90,14 +110,34 @@ def add_battery():
 def update_battery(battery_id):
     """Updates battery's status of charge, health, and voltage."""
 
+    request_time = datetime.utcnow()
     battery = Battery.query.get(battery_id)
     if battery:
         data = request.json
-        battery.update_battery(
-            state_of_charge=data.get("state_of_charge"),
-            voltage=data.get("voltage"),
-            battery_health=data.get("battery_health"),
+        state_of_charge = data.get("state_of_charge")
+        voltage = data.get("voltage")
+
+        log = BatteryLog(
+            battery_id=battery_id,
+            state_of_charge=state_of_charge,
+            voltage=voltage,
+            timestamp=request_time,
         )
+        db.session.add(log)
+
+        battery_health = HealthCheck(
+            battery_id=battery_id,
+            current_health=battery.battery_health,
+            request_time=request_time,
+        ).check_condition()
+        battery.state_of_charge = state_of_charge
+        battery.voltage = voltage
+        battery.battery_health = battery_health
+        battery.updated_at = request_time
+        db.session.commit()
+
+        db.session.close()
+
         return jsonify(
             {"message": "Battery updated successfully", "id": battery_id}
         )

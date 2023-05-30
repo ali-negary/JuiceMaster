@@ -36,7 +36,7 @@ class Issue(db.Model):
         )
 
 
-# DDL QUERY: start#
+# DDL QUERY: start #
 
 # CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 #
@@ -48,4 +48,4 @@ class Issue(db.Model):
 #     occurrence_timestamp TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
 # );
 
-# DDL QUERY: end#
+# DDL QUERY: end #
