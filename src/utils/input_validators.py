@@ -42,6 +42,10 @@ def validate_issue_data(data):
     """Performs validation checks on the issue data.
     Returns an error message if the data is not valid."""
 
+    missing = [i for i in ["issue_type", "issue_description"] if i not in data]
+    if missing:
+        return f"Missing attributes for issue: {', '.join(missing)}"
+
     if not isinstance(data.get("issue_type"), str):
         return "Invalid 'type' for issue"
 
