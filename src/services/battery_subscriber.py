@@ -15,7 +15,7 @@ from src.services.battery_health_check import HealthCheck
 logger = logging.getLogger()
 
 battery_subscriber = Blueprint(
-    "battery_subscriber", __name__, url_prefix="/api/v1/subscriber/"
+    "battery_subscriber", __name__, url_prefix="/api/v1"
 )
 
 
