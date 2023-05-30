@@ -11,7 +11,7 @@ services:
       - postgres_db
     environment:
       - FLASK_APP=src.app
-      - SQLALCHEMY_DB_URI=${SQLALCHEMY_DB_URI}
+      - SQLALCHEMY_DB_URI=postgresql://${DB_USER}:${DB_PASSWORD}@JuiceMasterDB:5432/${DB_NAME}
     restart: always
     env_file:
       - .env
