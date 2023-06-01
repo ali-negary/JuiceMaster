@@ -8,6 +8,8 @@ JuiceMaster is a Flask-based API for managing batteries and tracking battery-rel
 - How to Run 
 - API Samples 
 - Unit Tests
+- Design Choices
+- Trade-offs
 
 ## Description
 JuiceMaster API allows you to perform various operations related to batteries and battery issues. It provides the following APIs:
