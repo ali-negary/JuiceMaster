@@ -1,4 +1,4 @@
-# Juice Master: Battery Insights API
+# Juice Master: Battery Insights Service
 
 JuiceMaster is a Flask-based API for managing batteries and tracking battery-related issues. It provides endpoints to perform CRUD operations on batteries, log battery information, and manage battery issues.
 
@@ -28,10 +28,10 @@ Here's a brief overview of the columns in each table:
 ### batteries
 
 - **battery_id:** The unique identifier for each battery.
-- **state_of_charge:** The current state of charge of the battery.
+- **state_of_charge:** The current state of charge of the battery (should be ranged in 0 to 100).
 - **capacity:** The capacity of the battery.
 - **voltage:** The voltage of the battery.
-- **battery_health:** The health status of the battery (can be "BAD" or "EXCELLENT").
+- **battery_health:** The health status of the battery (can be "BAD", "GOOD", "VERY GOOD", or "EXCELLENT").
 - **created_at:** The timestamp indicating when the battery was created.
 - **updated_at:** The timestamp indicating the last update to the battery.
 
@@ -54,9 +54,9 @@ Here's a brief overview of the columns in each table:
 
 To run the JuiceMaster API locally, follow these steps:
 
-1. Make sure you have docker installed in your device.
-2. Clone the repository: git clone https://github.com/ali-negary/JuiceMaster.git
-3. Navigate to the project directory: cd JuiceMaster
+1. Make sure you have Docker and Git installed in your device.
+2. Clone the repository by entering this command in your terminal: `git clone https://github.com/ali-negary/JuiceMaster.git`
+3. Navigate to the project directory: `cd JuiceMaster`
 4. Set up the necessary environment variables. Create a `.env` file in the root directory of the project containing DB_USER, DB_PASSWORD, DB_NAME.
 Here is a sample content for `.env` file:
 ```
@@ -216,3 +216,30 @@ Response:
     "message": "Issue deleted successfully"
 }
 ```
+
+## Unit Tests
+
+The JuiceMaster application has a comprehensive suite of unit tests to ensure the correctness and reliability of its codebase. These tests are designed to verify the functionality of individual components or units of code in isolation.
+
+### Testing framework
+The unit tests are implemented using the `pytest` framework, which provides a simple and expressive way to write tests.
+
+### Key Components Tested
+The unit tests cover various key components and functionalities of the JuiceMaster application, including:
+- **Battery health check:** Tests for the `HealthCheck` class, which checks the health condition of a battery based on its state of charge values.
+- **Battery issues:** Tests for the `battery_issues.py` APIs, which checks all the CRUD requests.
+- **Battery subscriber:** Tests for the `battery_subscriber.py` APIs, which checks all the CRUD requests.
+
+### Running the Tests
+
+1. Run `pip install -r requirements.txt` to install all the requirements.
+2. Navigate to the root directory of the project.
+3. Check if pytest is installed with this command: `pytest --version`
+4. Run `python -m pytest` in terminal.
+
+
+## Design Choices
+
+
+## Trade-offs
+
