@@ -21,10 +21,13 @@ class Issue(db.Model):
 
     battery = db.relationship("Battery", backref="issues")
 
-    def __init__(self, issue_type, issue_description, issue_id=None):
+    def __init__(
+        self, battery_id, issue_type, issue_description, issue_id=None
+    ):
         self.issue_id = issue_id if issue_id else uuid.uuid4()
         self.issue_type = issue_type
         self.issue_description = issue_description
+        self.battery_id = battery_id
 
     def __repr__(self):
         return (

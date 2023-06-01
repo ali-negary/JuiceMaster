@@ -2,6 +2,7 @@
 
 import os
 import unittest
+import uuid
 
 from src.app import create_app
 from src.database.database import db
@@ -17,14 +18,28 @@ class IssueAPITestCase(unittest.TestCase):
 
         # Create a test Flask app
         os.environ["TEST_MODE"] = "True"
-        os.environ["SQLALCHEMY_DB_URI"] = "sqlite:///:memory:"
-        app = create_app()
-        self.app = app
-        self.client = app.test_client()
+        os.environ[
+            "SQLALCHEMY_DB_URI"
+        ] = "postgresql://username:password@localhost:5432/database"
+        self.app = create_app()
+        self.client = self.app.test_client()
 
-        # Initialize the test database
-        with app.app_context():
+        with self.app.app_context():
             db.create_all()
+
+        self.battery_id = uuid.uuid4()
+        self.issue_id = uuid.uuid4()
+
+        with self.app.app_context():
+            battery = Battery(
+                battery_id=self.battery_id,
+                state_of_charge=50,
+                capacity=100,
+                voltage=12,
+                battery_health="EXCELLENT",
+            )
+            db.session.add(battery)
+            db.session.commit()
 
     def tearDown(self):
         """Tear down the test environment."""
@@ -36,51 +51,34 @@ class IssueAPITestCase(unittest.TestCase):
     def test_add_issue(self):
         """Test adding an issue to a battery."""
 
-        # Add a battery to the database
-        with self.app.app_context():
-            battery = Battery(
-                battery_id=1,
-                state_of_charge=50,
-                capacity=100,
-                voltage=12,
-                battery_health="EXCELLENT",
-            )
-            db.session.add(battery)
-            db.session.commit()
-
         # Make a POST request to add an issue to the battery
         response = self.client.post(
-            "/api/v1/incidents/batteries/1/issues",
+            f"/api/v1/batteries/{self.battery_id}/issues",
             json={
                 "issue_type": "temperature warning",
                 "issue_description": "High temperature",
             },
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
 
     def test_get_issues(self):
         """Test retrieving issues of a battery."""
 
         # Add a battery and an issue to the database
         with self.app.app_context():
-            battery = Battery(
-                battery_id=1,
-                state_of_charge=50,
-                capacity=100,
-                voltage=12,
-                battery_health="EXCELLENT",
-            )
             issue = Issue(
-                issue_id=1,
+                issue_id=self.issue_id,
                 issue_type="temperature warning",
                 issue_description="High temperature",
+                battery_id=self.battery_id,
             )
-            db.session.add(battery)
             db.session.add(issue)
             db.session.commit()
 
         # Make a GET request to retrieve the issues of the battery
-        response = self.client.get("/api/v1/incidents/batteries/1/issues")
+        response = self.client.get(
+            f"/api/v1/batteries/{self.battery_id}/issues"
+        )
         self.assertEqual(response.status_code, 200)
 
     def test_update_issue(self):
@@ -88,25 +86,18 @@ class IssueAPITestCase(unittest.TestCase):
 
         # Add a battery and an issue to the database
         with self.app.app_context():
-            battery = Battery(
-                battery_id=1,
-                state_of_charge=50,
-                capacity=100,
-                voltage=12,
-                battery_health="EXCELLENT",
-            )
             issue = Issue(
-                issue_id=1,
+                issue_id=self.issue_id,
                 issue_type="temperature warning",
                 issue_description="High temperature",
+                battery_id=self.battery_id,
             )
-            db.session.add(battery)
             db.session.add(issue)
             db.session.commit()
 
         # Make a PUT request to update the issue
         response = self.client.put(
-            "/api/v1/incidents/batteries/1/issues/1",
+            f"/api/v1/batteries/{self.battery_id}/issues/{self.issue_id}",
             json={
                 "issue_type": "overcharge alert",
                 "issue_description": "Battery overcharged",
@@ -119,22 +110,17 @@ class IssueAPITestCase(unittest.TestCase):
 
         # Add a battery and an issue to the database
         with self.app.app_context():
-            battery = Battery(
-                battery_id=1,
-                state_of_charge=50,
-                capacity=100,
-                voltage=12,
-                battery_health="EXCELLENT",
-            )
             issue = Issue(
-                issue_id=1,
+                issue_id=self.issue_id,
                 issue_type="temperature warning",
                 issue_description="High temperature",
+                battery_id=self.battery_id,
             )
-            db.session.add(battery)
             db.session.add(issue)
             db.session.commit()
 
         # Make a DELETE request to remove the issue
-        response = self.client.delete("/api/v1/incidents/batteries/1/issues/1")
+        response = self.client.delete(
+            f"/api/v1/batteries/{self.battery_id}/issues/{self.issue_id}"
+        )
         self.assertEqual(response.status_code, 200)

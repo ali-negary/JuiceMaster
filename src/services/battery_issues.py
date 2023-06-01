@@ -48,7 +48,7 @@ def add_battery_issue(battery_id):
         issue_type = data.get("issue_type")
         issue_description = data.get("issue_description")
 
-        issue = Issue(issue_type, issue_description)
+        issue = Issue(battery_id, issue_type, issue_description)
         issue_id = issue.issue_id
         battery.issues.append(issue)
         db.session.commit()
