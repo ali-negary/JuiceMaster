@@ -240,6 +240,19 @@ The unit tests cover various key components and functionalities of the JuiceMast
 
 ## Design Choices
 
+- **Microservices Architecture:** The application is designed as a microservice architecture, with separate components for different functionalities. This promotes scalability, maintainability, and modularity. The use of microservices allows for independent development and deployment of individual components, making it easier to scale and maintain the system.
+- **Database Schema:** The chosen database schema includes three tables: batteries, battery_logs, and issues. The batteries table stores information about batteries, while the battery_logs table logs state-of-charge and voltage data over time. The issues table tracks battery-related issues. This schema allows for efficient storage and retrieval of battery data while maintaining data integrity.
+- **ORM Framework:** SQLAlchemy is used as the ORM (Object-Relational Mapping) framework. It provides a high-level interface for interacting with the database, allowing for efficient database operations and abstraction of low-level SQL queries. SQLAlchemy provides flexibility and compatibility with multiple database systems.
+- **Containerization with Docker:** Docker and Docker Compose are used to containerize the application. Docker provides a lightweight and portable containerization solution, ensuring consistent behavior across different environments. Docker Compose is used to orchestrate multiple containers, allowing for easy setup and deployment of the application along with its dependencies.
 
 ## Trade-offs
 
+- **Complexity vs. Simplicity:**
+  - **Microservices:** While the microservices architecture provides scalability and modularity, it also introduces additional complexity, compared to monolithic design. 
+  - **Postgres:** The choice of database is a trade-off depending on the requirements. For this project SQLite could have been a good choice. But for the long run it would be less than useful.
+- **Performance vs. Storage:** The choice of database schema and data types involves a trade-off between performance and storage requirements. For example, using UUIDs as primary keys provides uniqueness and easy integration with other systems but may have some impact on performance and storage compared to integer-based primary keys. 
+- **Ease of Deployment vs. Customization:** Using Docker and Docker Compose simplifies the deployment process by providing a standardized environment. However, it may limit the level of customization and fine-tuning available for specific deployment scenarios. Also, it makes debugging a pain!
+- **Documentation:** I usually document APIs using Swagger or Postman documentation. In this project, due to lack of time I decided to give a sample of only successful response of APIs in this readme file.
+
+------
+**Note:** Certain sections of this readme were written with the assistance of ChatGPT, a language model developed by OpenAI.
